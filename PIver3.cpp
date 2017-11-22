@@ -27,8 +27,8 @@ struct Lines_window : Graph_lib::Window {       // inherits from Window
                  int w,                // width
                  int h,                // height
                  const string& title,  // label
-                 const string& file_name   //file name
-                 );       // MyRide Object
+                 const string& file_name);   //file name
+
 private:
     MyRide my_ride;     // Object to call all of our myride functionalities
 
@@ -39,29 +39,29 @@ private:
 
     Button add_customer;
     Button remove_customer;
-    
+
     Button add_driver;
     Button remove_driver;
-    
+
     Button add_place;
     Button remove_place;
-    
+
     Button change_account;
-    
+
     Button request_ride;
     Button place_B_type_button;
-    
+
     Button display_places;
     Button display_drivers;
     Button display_customers;
-    
+
     Menu how_to_display_places;
     Menu how_to_display_drivers;
     Menu how_to_display_customers;
-    
+
     Menu screen_dim;
-    
-    
+
+
     Menu a_r_customer;
     Menu a_r_driver;
     Menu a_r_place;
@@ -69,11 +69,11 @@ private:
     char type_B='n';
     char type_place_disp='a';
     char type_screen_disp='1';
-    
+
     char type_driver_disp='a';
     char type_customer_disp='a';
-    
-    
+
+
 
     //Add new customer boxes
     In_box c_name_account;
@@ -93,15 +93,15 @@ private:
     In_box p_tags;
     In_box p_latitude;
     In_box p_longitude;
-    
+
     //Make Payment Boxes
     In_box c_name;
     In_box amount_money;
-    
+
     //Request Ride Boxes
     In_box place_A_name;
     In_box place_B;
-    
+
     //Display photos driver
     In_box d_no_miles;
 
@@ -146,7 +146,7 @@ private:
     void Remove_Customer_pressed(){
         main_menu_pressed();
     }
-    
+
     //functions for adding or removing drivers
     void add_remove_driver_pressed(){
         hide_main_menu();
@@ -188,7 +188,7 @@ private:
         hide_main_menu();
         a_r_place.show();
     }
-    
+
     void add_place_option(){
         a_r_place.hide();
         p_name.show();
@@ -198,43 +198,43 @@ private:
         p_longitude.show();
         add_place.show();
     }
-    
+
     void Add_Place();
-    
+
     void Add_Place_pressed(){
         main_menu_pressed();
-        
+
     }
-    
+
     void remove_place_option(){
         a_r_place.hide();
         p_name.show();
         remove_place.show();
     }
-    
+
     void Remove_Place();
-    
+
     void Remove_Place_pressed(){
         main_menu_pressed();
-        
+
     }
-    
+
     //Make Payment
     void make_payment_pressed(){
         hide_main_menu();
-        
+
         c_name.show();
         amount_money.show();
         change_account.show();
     }
-    
+
     void change_account_pressed(){
         main_menu_pressed();
     }
     void Make_Payment();
-    
+
     //Request Ride
-    
+
     //functions for adding or removing customers
     void request_ride_pressed(){
         hide_main_menu();
@@ -244,48 +244,48 @@ private:
         place_B_type_button.show();
         request_ride.show();
     }
-    
+
     void Request_a_Ride();
-    
+
     void Request_a_Ride_pressed(){
         main_menu_pressed();
     }
-    
+
     void place_B_type_pressed(){
         place_B_type.show();
         place_B_type_button.hide();
     }
-    
-    
+
+
     void tags_pressed(){
         type_B='t';
         place_B_type.hide();
         place_B_type_button.show();
-        
-        
+
+
     }
-    
+
     void name_pressed(){
         type_B='n';
         place_B_type.hide();
         place_B_type_button.show();
-        
+
     }
-    
+
     void two_by_two_pressed(){
         type_screen_disp='1';
     }
-    
+
     void three_by_three_pressed(){
         type_screen_disp='2';
-        
+
     }
-    
+
     void two_by_three_pressed(){
         type_screen_disp='3';
-        
+
     }
-    
+
     //functions for displaying window
     void display_photos_of_places_pressed(){
         hide_main_menu();
@@ -293,85 +293,85 @@ private:
         screen_dim.show();
         how_to_display_places.show();
     }
-    
+
     void Display_Places();
-    
+
     void Display_Places_Pressed(){
         main_menu_pressed();
     }
-    
-    
+
+
     void all_places_pressed(){
         p_tags.hide();
         type_place_disp='a';
-        
+
     }
-    
+
     void a_places_certain_tag_pressed(){
         p_tags.show();
         type_place_disp='t';
-        
+
     }
-    
+
     //functions for displaying drivers
-    
+
     void display_photos_of_drivers_pressed(){
         hide_main_menu();
         display_drivers.show();
         screen_dim.show();
         how_to_display_drivers.show();
     }
-    
+
     void Display_Drivers();
-    
+
     void Display_Drivers_Pressed(){
         main_menu_pressed();
     }
-    
-    
+
+
     void all_drivers_pressed(){
         d_no_miles.hide();
         p_tags.hide();
-        
+
         type_driver_disp='a';
-        
+
     }
-    
+
     void a_drivers_certain_tag_pressed(){
         p_tags.show();
         d_no_miles.show();
         type_driver_disp='t';
-        
+
     }
-    
-    
-    
-    
+
+
+
+
     void display_photos_of_customers_pressed(){
         hide_main_menu();
         display_customers.show();
         screen_dim.show();
         how_to_display_customers.show();
     }
-    
+
     void Display_Customers();
-    
+
     void Display_Customers_Pressed(){
         main_menu_pressed();
     }
-    
-    
+
+
     void all_customers_pressed(){
         type_customer_disp='a';
-        
+
     }
-    
+
     void a_customers_neg_balance_pressed(){
-        
+
         type_customer_disp='n';
-        
+
     }
-    
+
     void main_menu_pressed() {
         //Back to main menu button pressed
         main_menu_button.hide();
@@ -379,7 +379,7 @@ private:
         add_customer.hide();
 
         remove_customer.hide();
-        
+
         c_name_account.hide();
         attach(c_name_account);
         c_name_account.hide();
@@ -396,7 +396,7 @@ private:
         add_driver.hide();
 
         remove_driver.hide();
-        
+
         d_name_account.hide();
         attach(d_name_account);
         d_name_account.hide();
@@ -418,81 +418,81 @@ private:
         attach(d_latitude);
         d_latitude.hide();
         main_menu.show();
-        
+
         a_r_place.hide();
         add_place.hide();
         remove_place.hide();
-        
+
         p_name.hide();
         attach(p_name);
         p_name.hide();
-        
+
         p_photo_name.hide();
         attach(p_photo_name);
         p_photo_name.hide();
-        
+
         p_tags.hide();
         attach(p_tags);
         p_tags.hide();
-        
-        
+
+
         p_longitude.hide();
         attach(p_longitude);
         p_longitude.hide();
-        
+
         p_latitude.hide();
         attach(p_latitude);
         p_latitude.hide();
-        
+
         c_name.hide();
         attach(c_name);
         c_name.hide();
-        
+
         amount_money.hide();
         attach(amount_money);
         amount_money.hide();
-        
+
         change_account.hide();
-        
-        
+
+
         place_B.hide();
         attach(place_B);
         place_B.hide();
-        
+
         place_A_name.hide();
         attach(place_A_name);
         place_A_name.hide();
-        
+
         place_B_type.hide();
         place_B_type_button.hide();
         request_ride.hide();
         main_menu.show();
-        
+
         how_to_display_places.hide();
         attach(how_to_display_places);
         how_to_display_places.hide();
-        
+
         how_to_display_customers.hide();
         attach(how_to_display_customers);
         how_to_display_customers.hide();
-        
+
         how_to_display_drivers.hide();
         attach(how_to_display_drivers);
         how_to_display_drivers.hide();
-        
+
         screen_dim.hide();
         attach(screen_dim);
         screen_dim.hide();
-        
+
         d_no_miles.hide();
         attach(d_no_miles);
         d_no_miles.hide();
-        
+
         display_places.hide();
         display_customers.hide();
         display_drivers.hide();
-        
-        
+
+
     }
 
     void quit(); //defined below
@@ -501,7 +501,7 @@ private:
     static void cb_quit(Address, Address);
 
     static void cb_main_menu(Address, Address);
-    
+
     //call back functions for buttons on main menu
     static void cb_add_remove_customer(Address, Address);
     static void cb_add_remove_driver(Address, Address);
@@ -511,8 +511,8 @@ private:
     static void cb_display_photos_places(Address, Address);
     static void cb_display_photos_drivers(Address, Address);
     static void cb_display_photos_customers(Address, Address);
-    
-    
+
+
     //call back functions for customer menu
     static void cb_add_customer_option(Address, Address);
     static void cb_add_customer(Address, Address);
@@ -524,47 +524,52 @@ private:
     static void cb_add_driver(Address, Address);
     static void cb_remove_driver_option(Address, Address);
     static void cb_remove_driver(Address, Address);
-  
+
     //call back functions for place menu
     static void cb_add_place_option(Address, Address);
     static void cb_add_place(Address, Address);
     static void cb_remove_place_option(Address, Address);
     static void cb_remove_place(Address, Address);
-    
+
     //callback functions for make payment menu
     static void cb_change_account(Address, Address);
-    
+
     //callback functions for requesting a ride
     static void cb_request_a_ride(Address, Address);
     static void cb_type_B_menu(Address, Address);
     static void cb_tags_B(Address, Address);
     static void cb_name_B(Address, Address);
-    
+
     //callback functions for displaying places
     static void cb_display_places(Address, Address);
     static void cb_how_to_display_places_menu(Address, Address);
     static void cb_a_places(Address, Address);
     static void cb_places_tag(Address, Address);
-    
+
     //callback functions for displaying drivers
     static void cb_display_drivers(Address, Address);
     static void cb_how_to_display_drivers_menu(Address, Address);
     static void cb_a_drivers(Address, Address);
     static void cb_drivers_tag(Address, Address);
-    
+
     //callback functions for displaying places
     static void cb_display_customers(Address, Address);
     static void cb_how_to_display_customers_menu(Address, Address);
     static void cb_a_customers(Address, Address);
     static void cb_customers_neg(Address, Address);
-    
+
     //callback functions for screen display
     static void cb_two_by_two(Address, Address);
     static void cb_three_by_three(Address, Address);
     static void cb_two_by_three(Address, Address);
-    
-    
-    
+
+private:
+    void my_error(string err) {
+      my_ride.writeFile();
+
+      error(err);
+    }
+
 };
 
 Lines_window::Lines_window(Point xy, int w, int h, const string& title,
@@ -705,7 +710,7 @@ d_no_miles( Point(200, 200), 100, 50, "Number of miles: ")
     main_menu.attach(new Button(Point(0,0), 0, 0, "Display Photos of Places", cb_display_photos_places));
     main_menu.attach(new Button(Point(0,0), 0, 0, "Display Photos of Drivers", cb_display_photos_drivers));
     main_menu.attach(new Button(Point(0,0), 0, 0, "Display Photos of Customers", cb_display_photos_customers));
-    
+
     attach(main_menu);
     attach(main_menu_button);
     main_menu_button.hide();
@@ -757,48 +762,48 @@ d_no_miles( Point(200, 200), 100, 50, "Number of miles: ")
 
     attach(d_latitude);
     d_latitude.hide();
-    
+
     ///Add Remove Place Menu
     a_r_place.attach(new Button(Point(0,0), 0,0, "Add Place", cb_add_place_option));
     a_r_place.attach(new Button(Point(0,0), 0,0, "Remove Place", cb_remove_place_option));
     attach(a_r_place);
     a_r_place.hide();
-    
+
     attach(p_name);
     p_name.hide();
-    
+
     attach(p_tags);
     p_tags.hide();
-    
+
     attach(p_photo_name);
     p_photo_name.hide();
-    
+
     attach(add_place);
     add_place.hide();
-    
+
     attach(remove_place);
     remove_place.hide();
-    
+
     attach(p_longitude);
     p_longitude.hide();
-    
+
     attach(p_latitude);
     p_latitude.hide();
-    
+
     attach(d_no_miles);
     d_no_miles.hide();
-    
+
     attach(c_name);
     c_name.hide();
     attach(amount_money);
     amount_money.hide();
-    
-    
+
+
     attach(change_account);
     change_account.hide();
-    
-    
-    
+
+
+
     ///Add Remove Driver Menu
     place_B_type.attach(new Button(Point(0,0), 0,0, "Name", cb_tags_B));
     place_B_type.attach(new Button(Point(0,0), 0,0, "Tags Driver", cb_name_B));
@@ -807,17 +812,17 @@ d_no_miles( Point(200, 200), 100, 50, "Number of miles: ")
     place_A_name.hide();
     attach(place_B_type);
     place_B_type.hide();
-    
+
     attach(place_B_type_button);
     place_B_type_button.hide();
-    
+
     attach(place_B);
     place_B.hide();
-    
+
     attach(request_ride);
     request_ride.hide();
-    
-    
+
+
     ///How to Display Places Menu
     how_to_display_places.attach(new Button(Point(0,0), 0, 0, "All Places", cb_a_places));
     how_to_display_places.attach(new Button(Point(0,0), 0, 0, "All Places with a Tag", cb_places_tag));
@@ -825,7 +830,7 @@ d_no_miles( Point(200, 200), 100, 50, "Number of miles: ")
     ///How to Display Places Menu
     how_to_display_drivers.attach(new Button(Point(0,0), 0, 0, "All Drivers", cb_a_drivers));
     how_to_display_drivers.attach(new Button(Point(0,0), 0, 0, "All Drivers with a certain Tag within a certain no. miles", cb_drivers_tag));
-    
+
     ///How to Display Customers Menu
     how_to_display_customers.attach(new Button(Point(0,0), 0, 0, "All Customers", cb_a_customers));
     how_to_display_customers.attach(new Button(Point(0,0), 0, 0, "All Customers with a negative balance", cb_customers_neg));
@@ -833,28 +838,28 @@ d_no_miles( Point(200, 200), 100, 50, "Number of miles: ")
     screen_dim.attach(new Button(Point(0,0), 0, 0, "2x2", cb_two_by_two));
     screen_dim.attach(new Button(Point(0,0), 0, 0, "3x3", cb_three_by_three));
     screen_dim.attach(new Button(Point(0,0), 0, 0, "2x3", cb_two_by_three));
-    
+
     attach(d_no_miles);
     d_no_miles.hide();
     attach(how_to_display_places);
     attach(how_to_display_drivers);
     attach(how_to_display_customers);
-    
-    
+
+
     how_to_display_places.hide();
     how_to_display_drivers.hide();
     how_to_display_customers.hide();
-    
+
     attach(screen_dim);
     screen_dim.hide();
     attach(display_places);
     attach(display_customers);
     attach(display_drivers);
-    
+
     display_places.hide();
     display_customers.hide();
     display_drivers.hide();
-    
+
 }
 
 ///QUIT BUTTON
@@ -892,15 +897,15 @@ void Lines_window::cb_add_customer(Address, Address pw) {
 }
 
 void Lines_window::Add_Customer() {
-    
+
     //recieve information from the GUI
     stringstream ss;
-    
+
     ss << c_name_account.get_string() << " "
         << c_account_balance.get_string() << " ";
-    
+
     Customer c;
-    
+
     ss >> c;
     my_ride.addCustomer(c);
     Add_Customer_pressed();
@@ -971,7 +976,7 @@ void Lines_window::Remove_Driver() {
 ///ADD/REMOVE PLACE
 void Lines_window::cb_add_remove_place(Address, Address pw) {
     reference_to<Lines_window>(pw).add_remove_place_pressed();  // next is defined next
-    
+
 }
 
 
@@ -986,7 +991,7 @@ void Lines_window::cb_add_place(Address, Address pw) {
 
 void Lines_window::Add_Place() {
     Add_Place_pressed();
-    
+
     cout<<"ADD NEW PLACE";
 }
 
@@ -1002,7 +1007,7 @@ void Lines_window::cb_remove_place(Address, Address pw) {
 
 void Lines_window::Remove_Place() {
     Remove_Place_pressed();
-    
+
     cout<<"ADD NEW PLACE";
 }
 
@@ -1027,11 +1032,11 @@ void Lines_window::cb_request_ride(Address, Address pw) {
 
 void Lines_window::cb_request_a_ride(Address, Address pw){
     reference_to<Lines_window>(pw).Request_a_Ride();  // next is defined next
-    
+
 }
 void Lines_window::cb_type_B_menu(Address, Address pw){
     reference_to<Lines_window>(pw).place_B_type_pressed();  // next is defined next
-    
+
 }
 void Lines_window::Request_a_Ride(){
     Request_a_Ride_pressed();
@@ -1053,7 +1058,7 @@ void Lines_window::cb_display_photos_places(Address, Address pw) {
 void Lines_window::cb_display_places(Address, Address pw) {
     reference_to<Lines_window>(pw).Display_Places();
     // next is defined next
-    
+
 }
 
 void Lines_window::Display_Places(){
@@ -1080,7 +1085,7 @@ void Lines_window::cb_display_photos_drivers(Address, Address pw) {
 void Lines_window::cb_display_drivers(Address, Address pw) {
     reference_to<Lines_window>(pw).Display_Drivers();
     // next is defined next
-    
+
 }
 
 void Lines_window::Display_Drivers(){
@@ -1104,7 +1109,7 @@ void Lines_window::cb_display_photos_customers(Address, Address pw) {
 void Lines_window::cb_display_customers(Address, Address pw) {
     reference_to<Lines_window>(pw).Display_Customers();
     // next is defined next
-    
+
 }
 
 void Lines_window::Display_Customers(){
