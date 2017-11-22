@@ -109,18 +109,25 @@ public:
   string address;       //the address of the place
   vector<string> tags;  //tags associated with the place (e.g. bar, gym..)
   Geo_loc location;     //the location (latitude and longitude represented as a Geo_loc)
+  String photo;         //the file location of the photo
 
   //constructors
 
   //default
-  Place_info() : name(""), address(""), location(Geo_loc(0,0)){};
+  Place_info() : name(""), address(""), location(Geo_loc(0,0)), photo("") {};
 
   //regular constructor
   Place_info(string location_name, string address_, vector<string> tags_,
-    Geo_loc locationn) : name(location_name), address(address_), tags(tags_),
-    location(locationn) {};
+    Geo_loc locationn, string ph) : name(location_name), address(address_), tags(tags_),
+    location(locationn), photo(ph) {};
 
   //accessor functions
+
+  string getPhoto() const {
+    //returns the file path for the photo
+    return photo;
+  }
+
   string getName()  const {
     //returns the name of the location
     return name;
@@ -155,7 +162,7 @@ public:
       else
         cout << tags[i] << ", ";
     }
-
+    cout << "Photo:\t" << photo << endl;
     //print location
     location.print();
     cout << endl;
@@ -180,6 +187,7 @@ ostream& operator<<(ostream& os, const Place_info& place)  {
   }
 
   //print location
+  os << "Photo:\t" << place.getPhoto() << endl;
   os << place.getLocation();
   os << endl;
   return os;
@@ -192,6 +200,7 @@ istream& operator>>(istream& is, Place_info& place)  {
   string address;                       //name of address
   vector<string> tags;                  //tags of the location
   Geo_loc location;                     //location (lat and lon)
+  String photo;                          //file location of the photo
 
   is >> name >> address >> location;    //read in variables
 
@@ -222,8 +231,14 @@ istream& operator>>(istream& is, Place_info& place)  {
     tags.push_back(curr_tag); //add to tags
   }
 
+  is >> photo;
+
+  if(!is) {
+    return is;
+  }
+
   //initialize place
-  place = Place_info(name, address, tags, location);
+  place = Place_info(name, address, tags, location, photo);
   //return good state of istream
   return is;
 }
@@ -236,17 +251,22 @@ public:
   string name;          //Name of the driver
   double account;       //amount of money driver has
   Geo_loc location;  //current location
+  string photo;       //file location of their photo
 
   //constructor
-  Driver(): name(""), account(0), location(Geo_loc()) {};
+  Driver(): name(""), account(0), location(Geo_loc()), photo("") {};
 
-  Driver(string d_name, Geo_loc d_location) :
-          name(d_name), account(0), location(d_location) {};
+  Driver(string d_name, Geo_loc d_location, string ph) :
+          name(d_name), account(0), location(d_location), photo(ph) {};
 
-  Driver(string d_name, double acc, Geo_loc d_location) :
-          name(d_name), account(acc), location(d_location) {};
+  Driver(string d_name, double acc, Geo_loc d_location, string ph) :
+          name(d_name), account(acc), location(d_location), photo(ph) {};
 
   //accessor functions
+  string getPhoto() const {
+    //returns file location of Photo
+    return photo;
+  }
   string getName() const  {
     //accesor to get name of the driver
     return name;
@@ -280,6 +300,7 @@ public:
           << "Account:\t$";
     //prints account value to 2 digits
     printf("%.2f\n", account);
+    cout << "Photo:\t" << photo << endl;
     cout << location;
   }
 
@@ -293,6 +314,7 @@ ostream& operator<<(ostream& os, const Driver& d) {
         << "Account:\t$";
   //prints account value to 2 digits
   os << d.getAccount() << endl;
+  os << "Photo:\t" << d.getPhoto() << endl;
   os << d.getGeoLocation();
   return os;
 }
@@ -304,15 +326,16 @@ istream& operator>>(istream& is, Driver& d)  {
   string name;    //storing Driver's Name
   double bal;     //Starting balance for diver account
   double lat, lon; //starting location
+  string photo;   //photo info
 
-  is >> name >> bal >> lat >> lon;
+  is >> name >> bal >> lat >> lon >> photo;
 
   //if wrong format return bad istream
   if(!is) {
     return is;
   }
   //initializes driver
-  d = Driver(name, bal, Geo_loc(lat, lon));
+  d = Driver(name, bal, Geo_loc(lat, lon), photo);
   //returns good istream
   return is;
 }
@@ -322,21 +345,27 @@ class Customer  {
 public:
 
   string name;          //Name of the customer
-  double account;       //amount of money customer has
+  double account;       //amount of money customer
+  string photo;         //file name of the photo
 
   //constructors
 
   //default
-  Customer() : name(""), account(0) {};
+  Customer() : name(""), account(0), photo("") {};
 
   //constuctor that initializes members
-  Customer(string c_name) :
-            name(c_name), account(0) {};
+  Customer(string c_name, string ph) :
+            name(c_name), account(0), photo(ph) {};
 
-  Customer(string c_name, double bal) :
-            name(c_name), account(bal) {};
+  Customer(string c_name, double bal, string ph) :
+            name(c_name), account(bal), photo(ph) {};
 
   //accessor functions
+
+  string getPhoto() const {
+    return photo;
+  }
+
   string getName() const  {
     //accesor to get name of the customer
     return name;
@@ -364,6 +393,7 @@ public:
           << "Account:\t$";
     //Prints accout in 2 decimal format
     printf("%.2f\n", account);
+    cout << "Photo\t" << photo << endl;
   }
 
 };
@@ -375,6 +405,7 @@ ostream& operator<<(ostream& os, const Customer& c) {
         << "Account:\t$";
   //Prints accout in 2 decimal format
   os << c.getAccount() << endl;
+  os << "Photo:\t" << c.getPhoto() << endl;
   return os;
 }
 //override >> for customers
@@ -383,9 +414,10 @@ istream& operator>>(istream& is, Customer& c) {
 
   string name;      //storing customers name
   double bal;       //starting balance for customers
+  string photo;     //file name for the photo
 
 
-  is >> name >> bal;
+  is >> name >> bal >> photo;
 
   //if wrong format return bad istream
   if(!is) {
@@ -393,7 +425,7 @@ istream& operator>>(istream& is, Customer& c) {
   }
 
   //initialize custoemer
-  c = Customer(name, bal);
+  c = Customer(name, bal, photo);
   //return good istream
   return is;
 }
@@ -429,31 +461,35 @@ public:
     cout << endl << c.getName() << " has been added into the system" << endl << endl;
   }
 
-  void addDriver()  {
-    //adds a new driver to the system
-
-    string name;                    //to store the drivers name
-    cout << "What is your first name? ";  //prompt;
-    cin >> name;
-
-    if(!cin)  {
-      //error check
-      //save what we can
-      writeFile();
-      error("Invalid Name");
+  //returns true if customer was found and removes, false if the name wasnt found
+  bool removeCustomer(string name)  {
+    for(int i = 0; i < customers.size(); i++) {
+      if(customers[i].getName() == name) {
+        customers.erase(customers.begin()+i);
+        return true;
+      }
     }
+    return false;
+  }
 
-    //add driver to the system
-    string input;             //stores input of the user
+  void addDriver(const Driver &d)  {
 
-    Place_info driver_location = askLocation("Where are you currently at?");   //prompts the user and gets the location
-
-
-    drivers.push_back(Driver(name, driver_location.getLocation()));       //adds driver to the system
+    drivers.push_back(d);       //adds driver to the system
 
     //confirms to the user
-    cout << endl << name << " has been added to the system.\n" << endl;
+    cout << endl << d.getName() << " has been added to the system.\n" << endl;
 
+  }
+
+  //returns true if driver was found and removes, false if the name wasnt found
+  bool removeDriver(string name)  {
+    for(int i = 0; i < drivers.size(); i++) {
+      if(drivers[i].getName() == name) {
+        drivers.erase(drivers.begin()+i);
+        return true;
+      }
+    }
+    return false;
   }
 
   void printLocations() {
@@ -854,6 +890,8 @@ public:
         file << d.getGeoLocation().getLatitude();
         file << " ";
         file << d.getGeoLocation().getLongitude();
+        file << " ";
+        file << d.getPhoto();
         file << "\n";
       }
 
@@ -866,6 +904,8 @@ public:
         Customer c = customers[i];
         file << c.getName() + " ";
         file << c.getAccount();
+        file << " ";
+        file << c.getPhoto();
         file << "\n";
       }
 
@@ -892,6 +932,9 @@ public:
         for(size_t i = 0; i < t.size(); i++) {
           file << " " + t[i];
         }
+
+        file << " ";
+        file << p.getPhoto();
         file << "\n";
       }
 
@@ -904,6 +947,7 @@ public:
 private:
 
   void initLoc()  {
+    /*
     //Add 6 locations to the vector
 
     //Kyle Field
@@ -965,6 +1009,7 @@ private:
 
     //add Terrell to brazos locations
     locations.push_back(terrell_farms);
+    */
   }
 
   Place_info askLocation(string prompt) {
