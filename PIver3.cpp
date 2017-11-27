@@ -1128,7 +1128,9 @@ void Lines_window::Display_Drivers(){
 
     for(int i = 0; i < r; i++)  {
       for(int j = 0; j < c; j++)  {
-        imgs.push_back(new Image(Point(l/c + j*l/c, w/r + i*w/r), drivers[index++].getPhoto()));
+        if(index < drivers.size()) {
+          imgs.push_back(new Image(Point(l/c + j*l/c, w/r + i*w/r), drivers[index++].getPhoto()));
+        }
       }
     }
     //attach all the images
@@ -1190,7 +1192,7 @@ void Lines_window::cb_three_by_three(Address, Address pw) {
 int main()
 try {
     // construct the GUI window
-    Lines_window win(Point(100,100),600,400,"lines", "hw5doc.txt");
+    Lines_window win(Point(100,100),600,400,"lines", "customers.txt");
     return gui_main();  // inherited from Window; calls FLTK's run
 }
 catch(exception& e) {
