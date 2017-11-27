@@ -569,7 +569,6 @@ private:
 
       error(err);
     }
-
 };
 
 Lines_window::Lines_window(Point xy, int w, int h, const string& title,
@@ -907,6 +906,11 @@ void Lines_window::Add_Customer() {
     Customer c;
 
     ss >> c;
+
+    if(!ss) {
+      my_error("Invalid customer information");
+    }
+
     my_ride.addCustomer(c);
     Add_Customer_pressed();
 
@@ -1053,6 +1057,7 @@ void Lines_window::cb_tags_B(Address, Address pw) {
 ///Display Photos of Places
 void Lines_window::cb_display_photos_places(Address, Address pw) {
     reference_to<Lines_window>(pw).display_photos_of_places_pressed();  // next is defined next
+
 }
 
 void Lines_window::cb_display_places(Address, Address pw) {
@@ -1080,6 +1085,7 @@ void Lines_window::cb_places_tag(Address, Address pw) {
 ///Diplay photos of drivers
 void Lines_window::cb_display_photos_drivers(Address, Address pw) {
     reference_to<Lines_window>(pw).display_photos_of_drivers_pressed();  // next is defined next
+
 }
 
 void Lines_window::cb_display_drivers(Address, Address pw) {
@@ -1089,6 +1095,47 @@ void Lines_window::cb_display_drivers(Address, Address pw) {
 }
 
 void Lines_window::Display_Drivers(){
+
+    //get the Drivers from my_ride
+    vector<Driver> drivers = my_ride.getDrivers();
+
+    int l = x_max();   //length of screen
+    int w = y_max();    //width of screen
+    int page = 0;
+    int r = -1;
+    int c = -1;
+    if(type_screen_disp == 1) {
+      //print 2x2
+      r = 2;
+      c = 2;
+    }
+    else if(type_screen_disp == 2)  {
+      //print 3x3
+      r = 3;
+      c = 3;
+    }
+    else if(type_screen_disp == 3)  {
+      //print 2x3
+      r = 2;
+      c = 3;
+    }
+    else {
+      error("type_screen_disp was not 1, 2 or 3");
+    }
+
+    int index = page*r*c;
+    vector<Image*> imgs;
+
+    for(int i = 0; i < r; i++)  {
+      for(int j = 0; j < c; j++)  {
+        imgs.push_back(new Image(Point(l/c + j*l/c, w/r + i*w/r), drivers[index++].getPhoto()));
+      }
+    }
+    //attach all the images
+    for(Image* i : imgs)  {
+      attach(*i);
+    }
+
     Display_Drivers_Pressed();
 }
 
