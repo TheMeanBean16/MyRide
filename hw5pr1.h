@@ -233,6 +233,11 @@ istream& operator>>(istream& is, Place_info& place)  {
 
   is >> photo;
 
+  ifstream p{photo};
+  if(!p)  {
+    is.setstate(std::ios::failbit);
+  }
+
   if(!is) {
     return is;
   }
@@ -330,10 +335,17 @@ istream& operator>>(istream& is, Driver& d)  {
 
   is >> name >> bal >> lat >> lon >> photo;
 
+  ifstream p{photo};
+  if(!p)  {
+    is.setstate(std::ios::failbit);
+  }
+
   //if wrong format return bad istream
   if(!is) {
     return is;
   }
+
+
   //initializes driver
   d = Driver(name, bal, Geo_loc(lat, lon), photo);
   //returns good istream
@@ -418,6 +430,11 @@ istream& operator>>(istream& is, Customer& c) {
 
 
   is >> name >> bal >> photo;
+
+  ifstream p{photo};
+  if(!p)  {
+    is.setstate(std::ios::failbit);
+  }
 
   //if wrong format return bad istream
   if(!is) {
