@@ -64,7 +64,7 @@ protected:
     
     Menu screen_dim;
     
-    int page=0;
+    int page=1;
     int last_page=0;
     Menu a_r_customer;
     Menu a_r_driver;
@@ -78,6 +78,7 @@ protected:
     char type_customer_disp='a';
     char middle_page='y';
     vector<Image*> imgs;
+    vector<Text*> info;
     
     //Add new customer boxes
     In_box c_name_account;
@@ -512,6 +513,14 @@ protected:
         
         imgs.clear();
         
+        for(Text* t : info)  {
+            detach(*t);
+            cout<<"detach"<<endl;
+            delete t;
+        }
+        
+        info.clear();
+        
         next_button.hide();
         prev_button.hide();
         
@@ -915,11 +924,18 @@ void Lines_window::next() {
 
         for(Image* i : imgs)  {
             detach(*i);
-            cout<<"detach"<<endl;
             delete i;
             
         }
     imgs.clear();
+    
+    for(Text* t : info)  {
+        detach(*t);
+        delete t;
+    }
+    
+    info.clear();
+        
 
     cout<<"Imgs size: "<<imgs.size()<<endl;
     
@@ -941,12 +957,17 @@ void Lines_window::prev() {
     
         for(Image* i : imgs)  {
             detach(*i);
-            cout<<"detach";
             delete i;
             
         }
     
+    for(Text* t : info)  {
+        detach(*t);
+        delete t;
+        
+    }
     imgs.clear();
+    info.clear();
     
     cout<<imgs.size();
     
@@ -1152,8 +1173,8 @@ void Lines_window::Display_Places(){
     
     int l = x_max()-50;   //length of screen
     int w = y_max();    //width of screen
-    int r = -1;
-    int c = -1;
+    double r = -1;
+    double c = -1;
     int last_page;
     if(type_screen_disp == '1') {
         //print 2x2
@@ -1204,6 +1225,7 @@ void Lines_window::Display_Places(){
             cout<<"Index of photo: "<<index<<endl;
             if(index< places.size()){
                 imgs.push_back(new Image(Point(5+ j*l/c, 5 + i*w/r), places[index].getPhoto()+".jpg"));
+                
                 index++;
             }
         }
@@ -1280,6 +1302,8 @@ void Lines_window::Display_Drivers(){
         error("type_screen_disp was not 1, 2 or 3");
     }
     
+    next_button.hide();
+    prev_button.hide();
     
     next_button.show();
     prev_button.show();
@@ -1308,7 +1332,15 @@ void Lines_window::Display_Drivers(){
         for(int j = 0; j < c; j++)  {
             cout<<"Index of photo: "<<index<<endl;
             if(index< drivers.size()){
+                 stringstream ss;
+                 ss<<drivers[index].getAccount();
+                
                 imgs.push_back(new Image(Point(5+ j*l/c, 5 + i*w/r), drivers[index].getPhoto()+".jpg"));
+                info.push_back(new Text(Point(5+ j*l/c, 16 + i*w/r+w/r-60),
+                                        "Name: "+drivers[index].getName() ));
+                info.push_back(new Text(Point(5+ j*l/c, 26 + i*w/r+w/r-60),
+                                        "Location: "+(drivers[index].getGeoLocation()).print() ));
+                info.push_back(new Text(Point(5+ j*l/c, 36 + i*w/r+w/r-60), "Account: "+ss.str()));
                 index++;
             }
         }
@@ -1322,6 +1354,9 @@ void Lines_window::Display_Drivers(){
      attach(*i);
      }
     
+    for(Text* t: info){
+        attach(*t);
+    }
     
     //Display_Drivers_Pressed();
 }
@@ -1400,20 +1435,35 @@ void Lines_window::Display_Customers(){
     
     for(int i = 0; i < r; i++)  {
         for(int j = 0; j < c; j++)  {
-            cout<<"Index of photo: "<<index<<endl;
             if(index< customers.size()){
+                cout<<"Index of photo: "<<index<<endl;
+
+                stringstream ss;
+
                 imgs.push_back(new Image(Point(5+ j*l/c, 5 + i*w/r), customers[index].getPhoto()+".jpg"));
+                info.push_back(new Text(Point(5+ j*l/c, 16 + i*w/r+w/r-60), "Name: "+customers[index].getName() ));
+                
+                ss<<customers[index].getAccount();
+                
+                info.push_back(new Text(Point(5+ j*l/c, 26 + i*w/r+w/r-60), "Account: "+ss.str()));
                 index++;
+
             }
         }
         
     }
     
+    cout<<"Info size: "<<info.size();
     
     
     for(Image* i : imgs)  {
         i->resize(l/c-100, w/r-60);
         attach(*i);
+    }
+    
+    for(Text* t: info){
+        attach(*t);
+       
     }
     
 }
