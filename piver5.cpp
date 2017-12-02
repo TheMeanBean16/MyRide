@@ -49,7 +49,6 @@ protected:
     Button change_account;
     
     Button request_ride;
-    Button place_B_type_button;
     
     Button display_places;
     Button display_drivers;
@@ -66,10 +65,14 @@ protected:
     
     int page=0;
     int last_page=0;
+    
     Menu a_r_customer;
     Menu a_r_driver;
     Menu a_r_place;
-    Menu place_B_type;
+
+    Button place_B_tags;
+    Button place_B_name;
+    
     char type_B='n';
     char type_place_disp='a';
     char type_screen_disp='1';
@@ -77,8 +80,10 @@ protected:
     char type_driver_disp='a';
     char type_customer_disp='a';
     char middle_page='y';
+    
     string tag="";
     double dist=0;
+    
     vector<Image*> imgs;
     vector<Text*> info;
     
@@ -97,6 +102,7 @@ protected:
     //Add new place boxes
     In_box p_name;
     In_box p_photo_name;
+    In_box p_address;
     In_box p_tags;
     In_box p_latitude;
     In_box p_longitude;
@@ -200,6 +206,7 @@ protected:
         a_r_place.hide();
         p_name.show();
         p_photo_name.show();
+        p_address.show();
         p_tags.show();
         p_latitude.show();
         p_longitude.show();
@@ -248,7 +255,8 @@ protected:
         c_name.show();
         place_A_name.show();
         place_B.show();
-        place_B_type_button.show();
+        place_B_name.show();
+        place_B_tags.show();
         request_ride.show();
     }
     
@@ -258,24 +266,16 @@ protected:
         main_menu_pressed();
     }
     
-    void place_B_type_pressed(){
-        place_B_type.show();
-        place_B_type_button.hide();
-    }
+   
     
     
     void tags_pressed(){
         type_B='t';
-        place_B_type.hide();
-        place_B_type_button.show();
-        
         
     }
     
     void name_pressed(){
         type_B='n';
-        place_B_type.hide();
-        place_B_type_button.show();
         
     }
     
@@ -450,6 +450,9 @@ protected:
         attach(p_tags);
         p_tags.hide();
         
+        p_address.hide();
+        attach(p_address);
+        p_address.hide();
         
         p_longitude.hide();
         attach(p_longitude);
@@ -478,8 +481,14 @@ protected:
         attach(place_A_name);
         place_A_name.hide();
         
-        place_B_type.hide();
-        place_B_type_button.hide();
+        place_B_name.hide();
+        place_B_tags.hide();
+        
+        attach(place_B_name);
+        attach(place_B_tags);
+        place_B_name.hide();
+        place_B_tags.hide();
+        
         request_ride.hide();
         main_menu.show();
         
@@ -672,11 +681,7 @@ a_r_place(
           100, 100,
           Menu::vertical,
           "Add/Remove Place"),
-place_B_type(
-             Point(130, 10),
-             35, 35,
-             Menu::vertical,
-             "Place B Type"),
+
 
 how_to_display_places(
                       Point(30, 10),
@@ -702,7 +707,6 @@ screen_dim(
            "How to Display Places on the Screen"),
 
 
-place_B_type_button(Point(200, 200), 100, 50, " Place B: ", cb_type_B_menu),
 
 c_name_account( Point(200, 30), 100, 75, "Customer Name: "),
 c_account_balance( Point(200, 100), 100, 75, "Account Balance: "),
@@ -714,6 +718,7 @@ d_account_balance( Point(200, 80), 100, 50, "Driver Balance: "),
 d_photo_name(    Point(200, 130), 100, 50, "Driver Photo Name: "),
 d_latitude( Point(200, 180), 100, 50, "Driver latitude: "),
 d_longitude(  Point(200, 220), 100, 50, "Driver longitude: "),
+p_address(Point(200, 280), 150, 50, "Place Address: "),
 
 p_name( Point(200, 30), 100, 50, "Place Name: "),
 p_tags( Point(200, 130), 100, 50, "P-tags: "),
@@ -726,6 +731,11 @@ amount_money( Point(200, 80), 100, 50, "Amount of Money" ),
 
 place_A_name( Point(200, 80), 100, 50, "Name Place A: " ),
 place_B      ( Point(200, 130), 100, 50,  " Place B: " ),
+
+place_B_name(Point(200, 185),
+             35, 35, "Name", cb_name_B),
+place_B_tags(Point(245, 185),
+             35, 35, "Tags", cb_tags_B),
 
 next_button( Point(200, 350), 50, 50, "Next: " , cb_next),
 prev_button( Point (50, 350), 50, 50, "Prev:", cb_prev),
@@ -813,6 +823,9 @@ d_no_miles( Point(200, 200), 100, 50, "Number of miles: ")
     attach(p_tags);
     p_tags.hide();
     
+    attach(p_address);
+    p_address.hide();
+    
     attach(p_photo_name);
     p_photo_name.hide();
     
@@ -840,19 +853,15 @@ d_no_miles( Point(200, 200), 100, 50, "Number of miles: ")
     attach(change_account);
     change_account.hide();
     
-    
-    
-    ///Add Remove Driver Menu
-    place_B_type.attach(new Button(Point(0,0), 0,0, "Name", cb_tags_B));
-    place_B_type.attach(new Button(Point(0,0), 0,0, "Tags Driver", cb_name_B));
     ///Request a ride
     attach(place_A_name);
     place_A_name.hide();
-    attach(place_B_type);
-    place_B_type.hide();
     
-    attach(place_B_type_button);
-    place_B_type_button.hide();
+    attach(place_B_name);
+    attach(place_B_tags);
+    place_B_name.hide();
+    place_B_tags.hide();
+    
     
     attach(place_B);
     place_B.hide();
@@ -995,7 +1004,8 @@ void Lines_window::Add_Customer() {
     stringstream ss;
     
     ss << c_name_account.get_string() << " "
-    << c_account_balance.get_string() << " ";
+    << c_account_balance.get_string() << " "
+    << c_photo_name.get_string() << " " ;
     
     Customer c;
     
@@ -1008,6 +1018,7 @@ void Lines_window::Add_Customer() {
     my_ride.addCustomer(c);
     Add_Customer_pressed();
     
+    cout<<"ADD NEW CUSTOMER" << endl;
 }
 
 
@@ -1021,11 +1032,26 @@ void Lines_window::cb_remove_customer(Address, Address pw) {
 }
 
 void Lines_window::Remove_Customer() {
+    
+    stringstream ss;
+    
+    ss << c_name_account.get_string() << " ";
+    
+    bool decision;
+    decision = my_ride.removeCustomer(c_name_account.get_string());
+    
     Remove_Customer_pressed();
     
-    cout<<"ADD NEW CUSTOMER";
+    if (decision)
+    {
+        cout << "CUSTOMER REMOVED" << endl;
+    }
+    else
+    {
+        cout << "CUSTOMER NOT FOUND" << endl;
+    }
+    
 }
-
 
 
 
@@ -1046,9 +1072,27 @@ void Lines_window::cb_add_driver(Address, Address pw) {
 }
 
 void Lines_window::Add_Driver() {
+    
+    stringstream ss;
+    
+    ss << d_name_account.get_string() << " "
+    << d_account_balance.get_string() << " "
+    << d_latitude.get_string() << " "
+    << d_longitude.get_string() << " "
+    << d_photo_name.get_string() << " ";
+    
+    Driver d;
+    
+    ss >> d;
+    
+    if (!ss) {
+        my_error("Invalid driver information");
+    }
+    
+    my_ride.addDriver(d);
+    
     Add_Driver_pressed();
     
-    cout<<"ADD NEW CUSTOMER";
 }
 
 
@@ -1062,11 +1106,25 @@ void Lines_window::cb_remove_driver(Address, Address pw) {
 }
 
 void Lines_window::Remove_Driver() {
+    
+    stringstream ss;
+    
+    ss << d_name_account.get_string() << " ";
+    
+    bool decision;
+    decision = my_ride.removeDriver(d_name_account.get_string());
+    
     Remove_Driver_pressed();
     
-    cout<<"ADD NEW DRIVER";
+    if (decision)
+    {
+        cout << "DRIVER REMOVED" << endl;
+    }
+    else
+    {
+        cout << "DRIVER NOT FOUND" << endl;
+    }
 }
-
 
 
 
@@ -1087,11 +1145,57 @@ void Lines_window::cb_add_place(Address, Address pw) {
 }
 
 void Lines_window::Add_Place() {
+    
+    stringstream ss1;
+    
+    string name = p_name.get_string();                          //name of location
+    string address = p_address.get_string();                       //name of address
+    vector<string> tags;                  //tags of the location
+    Geo_loc location;                                //location (lat and lon)
+    String photo = p_photo_name.get_string();
+    
+    ss1 << p_latitude.get_string() << " "
+    << p_longitude.get_string();
+    
+    ss1 >> location;
+    
+    if (!ss1)
+    {
+        my_error("Invalid latitude and longitude");
+    }
+    
+    stringstream ss;
+    
+    ss << p_tags.get_string();
+    
+    string tag;
+
+    while (ss >> tag)
+    {
+        if (!ss)
+        {
+            my_error("Invalid tags");
+        }
+        
+        tags.push_back(tag);
+        
+        if (ss.peek() == ',' || ss.peek() == ' ')
+        {
+            ss.ignore();
+        }
+    }
+    Place_info p;
+    
+    p = Place_info(name, address, tags, location, photo);
+    
+    my_ride.addPlace(p);
+    
+    
     Add_Place_pressed();
     
-    cout<<"ADD NEW PLACE";
+    cout<<"ADD NEW PLACE" << endl;
+     
 }
-
 
 ///Remove Place option
 void Lines_window::cb_remove_place_option(Address, Address pw) {
@@ -1103,10 +1207,35 @@ void Lines_window::cb_remove_place(Address, Address pw) {
 }
 
 void Lines_window::Remove_Place() {
+    
+    stringstream ss;
+    
+    ss << p_name.get_string() << " ";
+    
+    Place_info p;
+    
+    ss >> p;
+    
+    bool decision;
+    decision = my_ride.removePlace(p);
+    
+    
+    if (decision)
+    {
+        cout << "PLACE REMOVED" << endl;
+    }
+    else
+    {
+        cout << "PLACE NOT FOUND" << endl;
+    }
+    
+    
     Remove_Place_pressed();
     
-    cout<<"ADD NEW PLACE";
+    cout<<"REMOVED PLACE" << endl;
+    
 }
+
 
 
 ///ADD/REMOVE DRIVER
@@ -1119,8 +1248,35 @@ void Lines_window::cb_change_account(Address, Address pw) {
 }
 
 void Lines_window::Make_Payment(){
+    
+    stringstream ss;
+    double pay;
+    
+    ss << amount_money.get_string() << " ";
+    ss >> pay;
+    if (!pay)
+    {
+        my_error("Pay must be a double");
+    }
+    
+    bool decision;
+    
+    decision = my_ride.makePayment(c_name.get_string(), pay);
+    
     change_account_pressed();
+    
+    if (decision)
+    {
+        cout << "PAYMENT CREDITED" << endl;
+    }
+    else
+    {
+        my_error("COULD NOT FIND CUSTOMER/ INVALID AMOUNT");
+    }
+    
+    
 }
+
 
 ///REQUEST A RIDE
 void Lines_window::cb_request_ride(Address, Address pw) {
@@ -1131,10 +1287,7 @@ void Lines_window::cb_request_a_ride(Address, Address pw){
     reference_to<Lines_window>(pw).Request_a_Ride();  // next is defined next
     
 }
-void Lines_window::cb_type_B_menu(Address, Address pw){
-    reference_to<Lines_window>(pw).place_B_type_pressed();  // next is defined next
-    
-}
+
 void Lines_window::Request_a_Ride(){
     Request_a_Ride_pressed();
 }
