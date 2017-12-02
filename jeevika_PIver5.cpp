@@ -29,7 +29,7 @@ struct Lines_window : Graph_lib::Window {       // inherits from Window
                  const string& title,  // label
                  const string& file_name);   //file name
     
-private:
+protected:
     MyRide my_ride;     // Object to call all of our myride functionalities
     
     
@@ -64,7 +64,8 @@ private:
     
     Menu screen_dim;
     
-    
+    int page=0;
+    int last_page=0;
     Menu a_r_customer;
     Menu a_r_driver;
     Menu a_r_place;
@@ -75,9 +76,12 @@ private:
     
     char type_driver_disp='a';
     char type_customer_disp='a';
-    
+    char middle_page='y';
+    string tag="";
+    double dist=0;
     vector<Image*> imgs;
-    int page=1;
+    vector<Text*> info;
+    
     //Add new customer boxes
     In_box c_name_account;
     In_box c_account_balance;
@@ -93,7 +97,6 @@ private:
     //Add new place boxes
     In_box p_name;
     In_box p_photo_name;
-	In_box p_address;
     In_box p_tags;
     In_box p_latitude;
     In_box p_longitude;
@@ -197,7 +200,6 @@ private:
         a_r_place.hide();
         p_name.show();
         p_photo_name.show();
-		p_address.show();
         p_tags.show();
         p_latitude.show();
         p_longitude.show();
@@ -257,9 +259,6 @@ private:
     }
     
     void place_B_type_pressed(){
-		c_name.hide();
-		place_A_name.hide();
-		place_B.hide();
         place_B_type.show();
         place_B_type_button.hide();
     }
@@ -450,10 +449,6 @@ private:
         p_tags.hide();
         attach(p_tags);
         p_tags.hide();
-
-		p_address.hide();
-		attach(p_address);
-		p_address.hide();
         
         
         p_longitude.hide();
@@ -515,9 +510,17 @@ private:
         
         for(Image* i : imgs)  {
             detach(*i);
+            delete i;
         }
         
         imgs.clear();
+        
+        for(Text* t : info)  {
+            detach(*t);
+            delete t;
+        }
+        
+        info.clear();
         
         next_button.hide();
         prev_button.hide();
@@ -628,51 +631,45 @@ main_menu_button(
                  cb_main_menu),
 
 add_customer(
-             Point(200, 300), 150, 75, "Add Customer", cb_add_customer),
+             Point(200, 300), 100, 75, "Add Customer", cb_add_customer),
 
 add_driver(
-           Point(200, 300), 150, 75, "Add Driver", cb_add_driver),
-
+           Point(200, 300), 100, 75, "Add Driver", cb_add_driver),
 add_place(
-          Point(200, 330), 150, 75, "Add Place", cb_add_place),
+          Point(200, 300), 100, 75, "Add Place", cb_add_place),
+
 
 remove_customer(
-                Point(200, 300), 150, 75, "Remove Customer", cb_remove_customer),
+                Point(200, 300), 100, 75, "Remove Customer", cb_remove_customer),
 
 remove_driver(
-              Point(200, 300), 150, 75, "Remove Driver", cb_remove_driver),
+              Point(200, 300), 100, 100, "Remove Driver", cb_remove_driver),
 
 remove_place(
-             Point(200, 300), 150, 75, "Remove Place", cb_remove_place),
+             Point(200, 300), 100, 100, "Remove Place", cb_remove_place),
 
 change_account(
-               Point(200, 300), 150, 75, "Change Account", cb_change_account),
+               Point(200, 300), 100, 75, "Change Account", cb_change_account),
 request_ride(
-             Point(200, 300), 150, 75, "Request Ride", cb_request_a_ride),
-
-display_places(
-	Point(200, 300), 150, 75, " Display Places", cb_display_places),
-
-display_drivers(
-	Point(200, 300), 150, 75, " Display Drivers", cb_display_drivers),
-
-display_customers(
-	Point(200, 300), 150, 75, " Display Customers", cb_display_customers),
+             Point(200, 300), 100, 75, "Request Ride", cb_request_a_ride),
+display_places(Point(200, 300), 100, 75, " Display Places", cb_display_places),
+display_drivers(Point(200, 300), 100, 75, " Display Drivers", cb_display_drivers),
+display_customers(Point(200, 300), 100, 75, " Display Customers", cb_display_customers),
 
 a_r_customer(
-             Point(30, 10),
-				150, 75,
+             Point(100, 100),
+             200, 200,
              Menu::vertical,
              "Add/Remove Customer"),
 a_r_driver(
            Point(30, 10),
-	150, 75,
+           100, 100,
            Menu::vertical,
            "Add/Remove Driver"),
 
 a_r_place(
           Point(30, 10),
-	150, 75,
+          100, 100,
           Menu::vertical,
           "Add/Remove Place"),
 place_B_type(
@@ -707,34 +704,32 @@ screen_dim(
 
 place_B_type_button(Point(200, 200), 100, 50, " Place B: ", cb_type_B_menu),
 
-c_name_account( Point(200, 30), 150, 50, "Customer Name: "),
-c_account_balance( Point(200, 100), 150, 50, "Account Balance: "),
-c_photo_name(   Point(200, 170), 150, 50, "Customer Photo Name: "),
+c_name_account( Point(200, 30), 100, 75, "Customer Name: "),
+c_account_balance( Point(200, 100), 100, 75, "Account Balance: "),
+c_photo_name(   Point(200, 170), 100, 75, "Customer Photo Name: "),
 
 
-d_name_account(Point(200, 30), 150, 50, "Driver Name: "),
-d_account_balance(Point(200, 80), 150, 50, "Driver Balance: "),
-d_photo_name(Point(200, 130), 150, 50, "Driver Photo Name: "),
-d_latitude(Point(200, 180), 150, 50, "Driver latitude: "),
-d_longitude(Point(200, 220), 150, 50, "Driver longitude: "),
+d_name_account( Point(200, 30), 100, 50, "Driver Name: "),
+d_account_balance( Point(200, 80), 100, 50, "Driver Balance: "),
+d_photo_name(    Point(200, 130), 100, 50, "Driver Photo Name: "),
+d_latitude( Point(200, 180), 100, 50, "Driver latitude: "),
+d_longitude(  Point(200, 220), 100, 50, "Driver longitude: "),
 
+p_name( Point(200, 30), 100, 50, "Place Name: "),
+p_tags( Point(200, 130), 100, 50, "P-tags: "),
+p_photo_name(   Point(200, 80), 100, 50, "Place Photo Name: "),
+p_latitude( Point(200, 180), 100, 50, "Driver latitude: "),
+p_longitude(  Point(200, 220), 100, 50, "Driver longitude: "),
 
-p_name(Point(200, 30), 150, 50, "Place Name: "),
-p_tags(Point(200, 130), 150, 50, "P-tags: "),
-p_photo_name(Point(200, 80), 150, 50, "Place Photo Name: "),
-p_latitude(Point(200, 180), 150, 50, "Place latitude: "),
-p_longitude(Point(200, 230), 150, 50, "Place longitude: "),
-p_address(Point(200, 280), 150, 50, "Place Address: "),
+c_name( Point(200, 30), 100, 50, "Customer Name: "),
+amount_money( Point(200, 80), 100, 50, "Amount of Money" ),
 
-c_name(Point(200, 30), 150, 50, "Customer Name: "),
-amount_money(Point(200, 80), 150, 50, "Amount of Money"),
-
-place_A_name(Point(200, 80), 150, 50, "Name Place A: "),
-place_B(Point(200, 130), 150, 50, " Place B: "),
+place_A_name( Point(200, 80), 100, 50, "Name Place A: " ),
+place_B      ( Point(200, 130), 100, 50,  " Place B: " ),
 
 next_button( Point(200, 350), 50, 50, "Next: " , cb_next),
 prev_button( Point (50, 350), 50, 50, "Prev:", cb_prev),
-d_no_miles( Point(200, 200), 150, 50, "Number of miles: ")
+d_no_miles( Point(200, 200), 100, 50, "Number of miles: ")
 
 {
     attach(quit_button);
@@ -817,9 +812,6 @@ d_no_miles( Point(200, 200), 150, 50, "Number of miles: ")
     
     attach(p_tags);
     p_tags.hide();
-
-	attach(p_address);
-	p_address.hide();
     
     attach(p_photo_name);
     p_photo_name.hide();
@@ -924,8 +916,24 @@ void Lines_window::cb_next(Address, Address pw) {
 }
 
 void Lines_window::next() {
+  
     
     page++;
+    
+    for(Image* i : imgs)  {
+        detach(*i);
+        delete i;
+        
+    }
+    imgs.clear();
+    
+    
+    for(Text* t : info)  {
+        detach(*t);
+        delete t;
+    }
+    
+    info.clear();
     
     Display_Drivers();
 }
@@ -936,7 +944,24 @@ void Lines_window::cb_prev(Address, Address pw) {
 }
 
 void Lines_window::prev() {
+    
     page--;
+    
+    for(Image* i : imgs)  {
+        detach(*i);
+        delete i;
+        
+    }
+    
+    for(Text* t : info)  {
+        detach(*t);
+        delete t;
+        
+    }
+    imgs.clear();
+    info.clear();
+    
+    cout<<imgs.size();
     
     Display_Drivers();  // FLTK idiom for delete window
 }
@@ -970,29 +995,25 @@ void Lines_window::Add_Customer() {
     stringstream ss;
     
     ss << c_name_account.get_string() << " "
-    << c_account_balance.get_string() << " "
-		<< c_photo_name.get_string() << " " ;
+    << c_account_balance.get_string() << " ";
     
     Customer c;
     
     ss >> c;
     
-   if(!ss) {
-       my_error("Invalid customer information");
+    if(!ss) {
+        my_error("Invalid customer information");
     }
     
     my_ride.addCustomer(c);
     Add_Customer_pressed();
     
-    cout<<"ADD NEW CUSTOMER" << endl;
 }
 
 
 ///Remove Customer option
 void Lines_window::cb_remove_customer_option(Address, Address pw) {
     reference_to<Lines_window>(pw).remove_customer_option();  // next is defined next
-
-	
 }
 
 void Lines_window::cb_remove_customer(Address, Address pw) {
@@ -1000,27 +1021,10 @@ void Lines_window::cb_remove_customer(Address, Address pw) {
 }
 
 void Lines_window::Remove_Customer() {
-
-	stringstream ss;
-
-	ss << c_name_account.get_string() << " ";
-
-	bool decision;
-	decision = my_ride.removeCustomer(c_name_account.get_string());
-
-	Remove_Customer_pressed();
-
-	if (decision)
-	{
-		cout << "CUSTOMER REMOVED" << endl;
-	}
-	else
-	{
-		cout << "CUSTOMER NOT FOUND" << endl;
-	}
-	
+    Remove_Customer_pressed();
+    
+    cout<<"ADD NEW CUSTOMER";
 }
-	
 
 
 
@@ -1042,28 +1046,9 @@ void Lines_window::cb_add_driver(Address, Address pw) {
 }
 
 void Lines_window::Add_Driver() {
-
-	stringstream ss;
-
-	ss << d_name_account.get_string() << " "
-		<< d_account_balance.get_string() << " " 
-		<< d_latitude.get_string() << " "
-		<< d_longitude.get_string() << " "
-		<< d_photo_name.get_string() << " ";
-
-	Driver d;
-
-	ss >> d;
-
-	if (!ss) {
-		my_error("Invalid driver information");
-	}
-
-	my_ride.addDriver(d);
-	
     Add_Driver_pressed();
     
-    cout<<"ADD NEW DRIVER" << endl;
+    cout<<"ADD NEW CUSTOMER";
 }
 
 
@@ -1077,24 +1062,9 @@ void Lines_window::cb_remove_driver(Address, Address pw) {
 }
 
 void Lines_window::Remove_Driver() {
-
-	stringstream ss;
-
-	ss << d_name_account.get_string() << " ";
-
-	bool decision;
-	decision = my_ride.removeDriver(d_name_account.get_string());
-
-	Remove_Driver_pressed();
-
-	if (decision)
-	{
-		cout << "DRIVER REMOVED" << endl;
-	}
-	else
-	{
-		cout << "DRIVER NOT FOUND" << endl;
-	}
+    Remove_Driver_pressed();
+    
+    cout<<"ADD NEW DRIVER";
 }
 
 
@@ -1117,55 +1087,9 @@ void Lines_window::cb_add_place(Address, Address pw) {
 }
 
 void Lines_window::Add_Place() {
-
-	stringstream ss1;
-
-	string name = p_name.get_string();                          //name of location
-	string address = p_address.get_string();                       //name of address
-	vector<string> tags;                  //tags of the location
-	Geo_loc location;								//location (lat and lon)
-	String photo = p_photo_name.get_string();
-
-	ss1 << p_latitude.get_string() << " "
-		<< p_longitude.get_string();
-
-	ss1 >> location; 
-
-	if (!ss1)
-	{
-		my_error("Invalid latitude and longitude");
-	}
-
-	stringstream ss;
-
-	ss << p_tags.get_string();
-
-	string tag;
-
-	while (ss >> tag)
-	{
-		if (!ss)
-		{
-			my_error("Invalid tags");
-		}
-
-		tags.push_back(tag);
-
-		if (ss.peek() == ',' || ss.peek() == ' ')
-		{
-			ss.ignore();
-		}
-	}
-	Place_info p;
-
-	p = Place_info(name, address, tags, location, photo);
-		
-	my_ride.addPlace(p);
-
-
     Add_Place_pressed();
     
-    cout<<"ADD NEW PLACE" << endl;
+    cout<<"ADD NEW PLACE";
 }
 
 
@@ -1179,36 +1103,13 @@ void Lines_window::cb_remove_place(Address, Address pw) {
 }
 
 void Lines_window::Remove_Place() {
-
-	stringstream ss;
-
-	ss << p_name.get_string() << " ";
-
-	Place_info p;
-
-	ss >> p;
-
-	bool decision;
-	decision = my_ride.removePlace(p);
-
-
-	if (decision)
-	{
-		cout << "PLACE REMOVED" << endl;
-	}
-	else
-	{
-		cout << "PLACE NOT FOUND" << endl;
-	}
-
-
-	Remove_Place_pressed();
+    Remove_Place_pressed();
     
-    cout<<"ADD NEW PLACE" << endl;
+    cout<<"ADD NEW PLACE";
 }
 
 
-///MAKE PAYMENT 
+///ADD/REMOVE DRIVER
 void Lines_window::cb_make_payment(Address, Address pw) {
     reference_to<Lines_window>(pw).make_payment_pressed();  // next is defined next
 }
@@ -1218,33 +1119,7 @@ void Lines_window::cb_change_account(Address, Address pw) {
 }
 
 void Lines_window::Make_Payment(){
-
-	stringstream ss;
-	double pay;
-
-	ss << amount_money.get_string() << " ";
-	ss >> pay;
-	if (!pay)
-	{
-		my_error("Pay must be a double");
-	}
-
-	bool decision;
-
-	decision = my_ride.makePayment(c_name.get_string(), pay);
-
-	change_account_pressed();
-
-		if (decision)
-		{
-			cout << "PAYMENT CREDITED" << endl;
-		}
-		else
-		{
-			my_error("COULD NOT FIND CUSTOMER/ INVALID AMOUNT");
-		}
-	
-	
+    change_account_pressed();
 }
 
 ///REQUEST A RIDE
@@ -1285,8 +1160,111 @@ void Lines_window::cb_display_places(Address, Address pw) {
 }
 
 void Lines_window::Display_Places(){
-    Display_Places_Pressed();
+    vector<Place_info> places = my_ride.locations;
+    
+    if(type_place_disp == 't')  {
+        //display all places with this tag
+        tag = p_tags.get_string();
+      
+        for(int i = 0; i < places.size(); i++)  {
+            bool contain = false;
+            for(String t : places[i].getTags()) {
+                contain |= (tag == t);
+            }
+            if(!contain)
+            { places.erase(places.begin()+i--);}
+        }
+        
+        if(places.size()==0){
+        info.push_back(new  Text(Point(100, 100),"There are no places like that in our system" ));
+        }
+        p_tags.hide();
+    }
+    
+    int l = x_max()-50;   //length of screen
+    int w = y_max();    //width of screen
+    double r = -1;
+    double c = -1;
+    int last_page;
+    if(type_screen_disp == '1') {
+        //print 2x2
+        r = 2;
+        c = 2;
+        
+        last_page=ceil(places.size()/4.0)-1;
+    }
+    else if(type_screen_disp == '2')  {
+        //print 3x3
+        r = 3;
+        c = 3;
+        last_page=ceil(places.size()/9.0)-1;
+    }
+    else if(type_screen_disp == '3')  {
+        //print 2x3
+        r = 2;
+        c = 3;
+        last_page=ceil(places.size()/6.0)-1;
+    }
+    else {
+        error("type_screen_disp was not 1, 2 or 3");
+    }
+    
+    next_button.hide();
+    prev_button.hide();
+    
+    next_button.show();
+    prev_button.show();
+    
+    
+    if (page==0){
+        prev_button.hide();
+    }
+    
+    
+    if( (page==last_page)|| (places.size()==0)){
+        next_button.hide();
+    }
+    
+    int index = page*r*c;
+    how_to_display_places.hide();
+    screen_dim.hide();
+    display_places.hide();
+    
+    
+    for(int i = 0; i < r; i++)  {
+        for(int j = 0; j < c; j++)  {
+            if(index< places.size()){
+                string tags;
+                for(auto i : places[index].getTags()){
+                    tags+=" "+i;
+                    
+                }
+                imgs.push_back(new Image(Point(5+ j*l/c, 5 + i*w/r), places[index].getPhoto()+".jpg"));
+                info.push_back(new Text(Point(5+ j*l/c, 16 + i*w/r+w/r-60),
+                                        "Name: "+places[index].getName() ));
+                info.push_back(new Text(Point(5+ j*l/c, 26 + i*w/r+w/r-60),
+                                        "Location: "+(places[index].getLocation()).print() ));
+                info.push_back(new Text(Point(5+ j*l/c, 36 + i*w/r+w/r-60), "Tags: "+tags));
+                index++;
+            }
+        }
+    }
+    
+    
+    for(Image* i : imgs)  {
+        i->resize(l/c-100, w/r-60);
+        attach(*i);
+    }
+    
+    for(Text* t: info){
+        attach(*t);
+    }
+    
 }
+    
+
+   
+
 
 void Lines_window::cb_a_places(Address, Address pw) {
     reference_to<Lines_window>(pw).all_places_pressed();  // next is defined next
@@ -1312,20 +1290,69 @@ void Lines_window::cb_display_drivers(Address, Address pw) {
     
 }
 
-
 void Lines_window::Display_Drivers(){
-    
-    if (imgs.size()>0){
-    for(Image* i : imgs)  {
-        detach(*i);
-        
-    }
-    }
-    imgs.clear();
-
     //get the Drivers from my_ride
     vector<Driver> drivers = my_ride.getDrivers();
     
+    if(type_driver_disp == 't') {
+        
+        //display all drivers within a certain location of a place with a tag
+        tag = p_tags.get_string();
+        vector<Place_info> places = my_ride.locations;
+        
+        vector<Place_info> places_w_tags;
+        
+        //prune list
+        for(int i = 0; i < places.size(); i++)  {
+            for(String t : places[i].getTags()) {
+                if(t == tag)  {
+                    places_w_tags.push_back(places[i]);
+                }
+            }
+        }
+        
+        dist= d_no_miles.get_int();
+        //prune Drivers
+        cout<<"Num places that have tag"<<places_w_tags.size()<<endl;
+        ///cout<<places_w_tags.size();
+        ///cout<<places_w_tags[0].getName();
+        
+        if(places_w_tags.size()==0){
+            drivers.clear();
+        }
+       
+        else {
+            for(int i = 0; i < drivers.size(); i++) {
+                bool close = false;
+                for(int j = 0; j < places_w_tags.size(); j++){
+                    close |= distance(drivers[i].getGeoLocation(), places_w_tags[j].getLocation()) <= dist;
+                }
+                if(!close)  {
+                    drivers.erase(drivers.begin()+i--);
+                }
+            }
+        }
+        
+        cout<<"Drivers that qualify"<<drivers.size()<<endl;
+        
+        
+        
+        p_tags.hide();
+        d_no_miles.hide();
+        
+        next_button.hide();
+        prev_button.hide();
+        
+        if (drivers.size()==0 ){
+            info.push_back(new  Text(Point(100, 100),"There are no drivers like that in our system" ));
+        }
+        
+        if (places_w_tags.size()==0 ){
+            info.push_back(new  Text(Point(100, 120),"There are no places with that tag   in our system" ));
+        }
+        
+       
+    }
     int l = x_max()-50;   //length of screen
     int w = y_max();    //width of screen
     int r = -1;
@@ -1354,61 +1381,63 @@ void Lines_window::Display_Drivers(){
         error("type_screen_disp was not 1, 2 or 3");
     }
     
+    next_button.hide();
+    prev_button.hide();
     
     next_button.show();
     prev_button.show();
+    
 
-    //Page checking and button showing
-    if (page<=0){
-        page=0;
+    
+    if (page==0){
         prev_button.hide();
     }
     
-    if (page>=last_page){
+    
+    if( (page==last_page) || (drivers.size()==0)){
         next_button.hide();
-        page=last_page;
-
     }
     
-
-    /*
-    if( (0<page)&& (page<last_page)){
-        prev_button.show();
-        next_button.show();
-    }
     
-    size_t index = page*r*c;
+
+    int index = page*r*c;
     how_to_display_drivers.hide();
     screen_dim.hide();
     display_drivers.hide();
     
     
+    
     for(int i = 0; i < r; i++)  {
         for(int j = 0; j < c; j++)  {
-            //cout<<"Index of photo: "<<index<<endl;
             if(index< drivers.size()){
-                imgs.push_back(new Image(Point(5+ j*l/c, 5 + i*w/r), drivers[index++].getPhoto()+".jpg"));
+                 stringstream ss;
+                 ss<<drivers[index].getAccount();
+                
+                imgs.push_back(new Image(Point(5+ j*l/c, 5 + i*w/r), drivers[index].getPhoto()+".jpg"));
+                info.push_back(new Text(Point(5+ j*l/c, 16 + i*w/r+w/r-60),
+                                        "Name: "+drivers[index].getName() ));
+                info.push_back(new Text(Point(5+ j*l/c, 26 + i*w/r+w/r-60),
+                                        "Location: "+(drivers[index].getGeoLocation()).print() ));
+                info.push_back(new Text(Point(5+ j*l/c, 36 + i*w/r+w/r-60), "Account: "+ss.str()));
+                index++;
             }
         }
         
     }
     
-    //attach all the images
     
-    int i = imgs.size()-1;
-    for(int j = 0; j < r*c; j++)    {
-        imgs[i]->resize(l/c-100, w/r-60);
-        attach(*imgs[i--]);
+    
+     for(Image* i : imgs)  {
+     i->resize(l/c-100, w/r-60);
+     attach(*i);
+     }
+    
+    for(Text* t: info){
+        attach(*t);
     }
-    /*
-    for(Image* i : imgs)  {
-        i->resize(l/c-100, w/r-60);
-        attach(*i);
-    }*/
-    
+   
     //Display_Drivers_Pressed();
 }
-
 
 void Lines_window::cb_a_drivers(Address, Address pw) {
     reference_to<Lines_window>(pw).all_drivers_pressed();  // next is defined next
@@ -1431,8 +1460,108 @@ void Lines_window::cb_display_customers(Address, Address pw) {
 }
 
 void Lines_window::Display_Customers(){
-    my_ride.printCustomersInfo();
-    Display_Customers_Pressed();
+    vector<Customer> customers = my_ride.getCustomers();
+    
+    if(type_customer_disp == 'n')   {
+        //prune negative customers
+        for(int i = 0; i < customers.size(); i++)
+        {
+            if(customers[i].getAccount() >= 0)   {
+                customers.erase(customers.begin() + i--);
+            }
+        }
+        
+       
+        
+        if (customers.size()==0){
+            info.push_back(new  Text(Point(100, 100),"There are no customers like that in our system" ));
+            
+        }
+    }
+    
+    int l = x_max()-50;   //length of screen
+    int w = y_max();    //width of screen
+    int r = -1;
+    int c = -1;
+    int last_page;
+    if(type_screen_disp == '1') {
+        //print 2x2
+        r = 2;
+        c = 2;
+        
+        last_page=ceil(customers.size()/4.0)-1;
+    }
+    else if(type_screen_disp == '2')  {
+        //print 3x3
+        r = 3;
+        c = 3;
+        last_page=ceil(customers.size()/9.0)-1;
+    }
+    else if(type_screen_disp == '3')  {
+        //print 2x3
+        r = 2;
+        c = 3;
+        last_page=ceil(customers.size()/6.0)-1;
+    }
+    else {
+        error("type_screen_disp was not 1, 2 or 3");
+    }
+    
+    next_button.hide();
+    prev_button.hide();
+    
+    next_button.show();
+    prev_button.show();
+    
+    
+    if (page==0){
+        prev_button.hide();
+    }
+    
+    
+    if( (page==last_page) || (customers.size()==0)){
+        next_button.hide();
+    }
+    cout<<"Page: "<<page;
+    
+    int index = page*r*c;
+    how_to_display_customers.hide();
+    screen_dim.hide();
+    display_customers.hide();
+    
+    
+    for(int i = 0; i < r; i++)  {
+        for(int j = 0; j < c; j++)  {
+            if(index< customers.size()){
+                cout<<"Index of photo: "<<index<<endl;
+
+                stringstream ss;
+
+                imgs.push_back(new Image(Point(5+ j*l/c, 5 + i*w/r), customers[index].getPhoto()+".jpg"));
+                info.push_back(new Text(Point(5+ j*l/c, 16 + i*w/r+w/r-60), "Name: "+customers[index].getName() ));
+                
+                ss<<customers[index].getAccount();
+                
+                info.push_back(new Text(Point(5+ j*l/c, 26 + i*w/r+w/r-60), "Account: "+ss.str()));
+                index++;
+
+            }
+        }
+        
+    }
+    
+    
+    
+    for(Image* i : imgs)  {
+        i->resize(l/c-100, w/r-60);
+        attach(*i);
+    }
+    
+    for(Text* t: info){
+        attach(*t);
+       
+    }
+    
 }
 
 void Lines_window::cb_a_customers(Address, Address pw) {
@@ -1472,3 +1601,4 @@ catch(exception& e) {
         cerr << "some exception\n";
         return 2;
     }
+
