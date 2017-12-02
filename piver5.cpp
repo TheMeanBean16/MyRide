@@ -64,7 +64,7 @@ protected:
     
     Menu screen_dim;
     
-    int page=1;
+    int page=0;
     int last_page=0;
     Menu a_r_customer;
     Menu a_r_driver;
@@ -77,6 +77,8 @@ protected:
     char type_driver_disp='a';
     char type_customer_disp='a';
     char middle_page='y';
+    string tag="";
+    double dist=0;
     vector<Image*> imgs;
     vector<Text*> info;
     
@@ -515,7 +517,6 @@ protected:
         
         for(Text* t : info)  {
             detach(*t);
-            cout<<"detach"<<endl;
             delete t;
         }
         
@@ -918,16 +919,14 @@ void Lines_window::next() {
   
     
     page++;
-    cout<<"In next"<<endl;
     
-    cout<<"Imgs size: "<<imgs.size()<<endl;
-
-        for(Image* i : imgs)  {
-            detach(*i);
-            delete i;
-            
-        }
+    for(Image* i : imgs)  {
+        detach(*i);
+        delete i;
+        
+    }
     imgs.clear();
+    
     
     for(Text* t : info)  {
         detach(*t);
@@ -935,10 +934,6 @@ void Lines_window::next() {
     }
     
     info.clear();
-        
-
-    cout<<"Imgs size: "<<imgs.size()<<endl;
-    
     
     Display_Drivers();
 }
@@ -949,17 +944,14 @@ void Lines_window::cb_prev(Address, Address pw) {
 }
 
 void Lines_window::prev() {
-   
+    
     page--;
     
-    cout<<"In prev"<<endl;
-    cout<<"Imgs size: "<<imgs.size();
-    
-        for(Image* i : imgs)  {
-            detach(*i);
-            delete i;
-            
-        }
+    for(Image* i : imgs)  {
+        detach(*i);
+        delete i;
+        
+    }
     
     for(Text* t : info)  {
         detach(*t);
@@ -1016,7 +1008,6 @@ void Lines_window::Add_Customer() {
     my_ride.addCustomer(c);
     Add_Customer_pressed();
     
-    cout<<"ADD NEW CUSTOMER";
 }
 
 
@@ -1171,6 +1162,25 @@ void Lines_window::cb_display_places(Address, Address pw) {
 void Lines_window::Display_Places(){
     vector<Place_info> places = my_ride.locations;
     
+    if(type_place_disp == 't')  {
+        //display all places with this tag
+        tag = p_tags.get_string();
+      
+        for(int i = 0; i < places.size(); i++)  {
+            bool contain = false;
+            for(String t : places[i].getTags()) {
+                contain |= (tag == t);
+            }
+            if(!contain)
+            { places.erase(places.begin()+i--);}
+        }
+        
+        if(places.size()==0){
+        info.push_back(new  Text(Point(100, 100),"There are no places like that in our system" ));
+        }
+        p_tags.hide();
+    }
+    
     int l = x_max()-50;   //length of screen
     int w = y_max();    //width of screen
     double r = -1;
@@ -1199,6 +1209,8 @@ void Lines_window::Display_Places(){
         error("type_screen_disp was not 1, 2 or 3");
     }
     
+    next_button.hide();
+    prev_button.hide();
     
     next_button.show();
     prev_button.show();
@@ -1209,10 +1221,9 @@ void Lines_window::Display_Places(){
     }
     
     
-    if( page==last_page){
+    if( (page==last_page)|| (places.size()==0)){
         next_button.hide();
     }
-    cout<<"Page: "<<page;
     
     int index = page*r*c;
     how_to_display_places.hide();
@@ -1222,22 +1233,33 @@ void Lines_window::Display_Places(){
     
     for(int i = 0; i < r; i++)  {
         for(int j = 0; j < c; j++)  {
-            cout<<"Index of photo: "<<index<<endl;
             if(index< places.size()){
+                string tags;
+                for(auto i : places[index].getTags()){
+                    tags+=" "+i;
+                    
+                }
                 imgs.push_back(new Image(Point(5+ j*l/c, 5 + i*w/r), places[index].getPhoto()+".jpg"));
-                
+                info.push_back(new Text(Point(5+ j*l/c, 16 + i*w/r+w/r-60),
+                                        "Name: "+places[index].getName() ));
+                info.push_back(new Text(Point(5+ j*l/c, 26 + i*w/r+w/r-60),
+                                        "Location: "+(places[index].getLocation()).print() ));
+                info.push_back(new Text(Point(5+ j*l/c, 36 + i*w/r+w/r-60), "Tags: "+tags));
                 index++;
             }
         }
-        
     }
-    
     
     
     for(Image* i : imgs)  {
         i->resize(l/c-100, w/r-60);
         attach(*i);
     }
+    
+    for(Text* t: info){
+        attach(*t);
+    }
+    
 }
     
 
@@ -1269,11 +1291,68 @@ void Lines_window::cb_display_drivers(Address, Address pw) {
 }
 
 void Lines_window::Display_Drivers(){
-   
-    
     //get the Drivers from my_ride
     vector<Driver> drivers = my_ride.getDrivers();
     
+    if(type_driver_disp == 't') {
+        
+        //display all drivers within a certain location of a place with a tag
+        tag = p_tags.get_string();
+        vector<Place_info> places = my_ride.locations;
+        
+        vector<Place_info> places_w_tags;
+        
+        //prune list
+        for(int i = 0; i < places.size(); i++)  {
+            for(String t : places[i].getTags()) {
+                if(t == tag)  {
+                    places_w_tags.push_back(places[i]);
+                }
+            }
+        }
+        
+        dist= d_no_miles.get_int();
+        //prune Drivers
+        cout<<"Num places that have tag"<<places_w_tags.size()<<endl;
+        ///cout<<places_w_tags.size();
+        ///cout<<places_w_tags[0].getName();
+        
+        if(places_w_tags.size()==0){
+            drivers.clear();
+        }
+       
+        else {
+            for(int i = 0; i < drivers.size(); i++) {
+                bool close = false;
+                for(int j = 0; j < places_w_tags.size(); j++){
+                    close |= distance(drivers[i].getGeoLocation(), places_w_tags[j].getLocation()) <= dist;
+                }
+                if(!close)  {
+                    drivers.erase(drivers.begin()+i--);
+                }
+            }
+        }
+        
+        cout<<"Drivers that qualify"<<drivers.size()<<endl;
+        
+        
+        
+        p_tags.hide();
+        d_no_miles.hide();
+        
+        next_button.hide();
+        prev_button.hide();
+        
+        if (drivers.size()==0 ){
+            info.push_back(new  Text(Point(100, 100),"There are no drivers like that in our system" ));
+        }
+        
+        if (places_w_tags.size()==0 ){
+            info.push_back(new  Text(Point(100, 120),"There are no places with that tag   in our system" ));
+        }
+        
+       
+    }
     int l = x_max()-50;   //length of screen
     int w = y_max();    //width of screen
     int r = -1;
@@ -1315,10 +1394,9 @@ void Lines_window::Display_Drivers(){
     }
     
     
-    if( page==last_page){
+    if( (page==last_page) || (drivers.size()==0)){
         next_button.hide();
     }
-    cout<<"Page: "<<page;
     
     
 
@@ -1327,10 +1405,10 @@ void Lines_window::Display_Drivers(){
     screen_dim.hide();
     display_drivers.hide();
     
-     
+    
+    
     for(int i = 0; i < r; i++)  {
         for(int j = 0; j < c; j++)  {
-            cout<<"Index of photo: "<<index<<endl;
             if(index< drivers.size()){
                  stringstream ss;
                  ss<<drivers[index].getAccount();
@@ -1357,7 +1435,7 @@ void Lines_window::Display_Drivers(){
     for(Text* t: info){
         attach(*t);
     }
-    
+   
     //Display_Drivers_Pressed();
 }
 
@@ -1383,6 +1461,23 @@ void Lines_window::cb_display_customers(Address, Address pw) {
 
 void Lines_window::Display_Customers(){
     vector<Customer> customers = my_ride.getCustomers();
+    
+    if(type_customer_disp == 'n')   {
+        //prune negative customers
+        for(int i = 0; i < customers.size(); i++)
+        {
+            if(customers[i].getAccount() >= 0)   {
+                customers.erase(customers.begin() + i--);
+            }
+        }
+        
+       
+        
+        if (customers.size()==0){
+            info.push_back(new  Text(Point(100, 100),"There are no customers like that in our system" ));
+            
+        }
+    }
     
     int l = x_max()-50;   //length of screen
     int w = y_max();    //width of screen
@@ -1412,6 +1507,8 @@ void Lines_window::Display_Customers(){
         error("type_screen_disp was not 1, 2 or 3");
     }
     
+    next_button.hide();
+    prev_button.hide();
     
     next_button.show();
     prev_button.show();
@@ -1422,7 +1519,7 @@ void Lines_window::Display_Customers(){
     }
     
     
-    if( page==last_page){
+    if( (page==last_page) || (customers.size()==0)){
         next_button.hide();
     }
     cout<<"Page: "<<page;
@@ -1453,7 +1550,6 @@ void Lines_window::Display_Customers(){
         
     }
     
-    cout<<"Info size: "<<info.size();
     
     
     for(Image* i : imgs)  {
