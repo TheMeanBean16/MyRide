@@ -11,7 +11,7 @@
 #include "Graph.h"     // next 3 are for graphics library
 #include "GUI.h"
 #include "Window.h"
-#include "hw5pr1.h"
+#include "hw5pr1_j.h"
 
 using namespace Graph_lib;
 using namespace std;
@@ -73,6 +73,7 @@ protected:
     Button place_B_tags;
     Button place_B_name;
     
+    char type_photos;
     char type_B='n';
     char type_place_disp='a';
     char type_screen_disp='1';
@@ -87,6 +88,7 @@ protected:
     vector<Image*> imgs;
     vector<Text*> info;
     
+   
     //Add new customer boxes
     In_box c_name_account;
     In_box c_account_balance;
@@ -263,7 +265,13 @@ protected:
     void Request_a_Ride();
     
     void Request_a_Ride_pressed(){
-        main_menu_pressed();
+        c_name.hide();
+        place_A_name.hide();
+        place_B.hide();
+        place_B_name.hide();
+        place_B_tags.hide();
+        request_ride.hide();
+        
     }
     
    
@@ -944,7 +952,14 @@ void Lines_window::next() {
     
     info.clear();
     
-    Display_Drivers();
+    if (type_photos=='d'){
+        Display_Drivers(); }
+    
+    if(type_photos=='c'){
+        Display_Customers();}
+    
+    if(type_photos=='p'){
+        Display_Places();}
 }
 
 ///PREV BUTTON
@@ -972,7 +987,15 @@ void Lines_window::prev() {
     
     cout<<imgs.size();
     
-    Display_Drivers();  // FLTK idiom for delete window
+    if (type_photos=='d'){
+        Display_Drivers(); }
+    
+    if(type_photos=='c'){
+        Display_Customers();}
+    
+    if(type_photos=='p'){
+        Display_Places();}
+
 }
 
 ///MAIN MENU
@@ -1208,17 +1231,14 @@ void Lines_window::cb_remove_place(Address, Address pw) {
 
 void Lines_window::Remove_Place() {
     
-    stringstream ss;
+    String place_name= p_name.get_string();
     
-    ss << p_name.get_string() << " ";
-    
-    Place_info p;
-    
-    ss >> p;
     
     bool decision;
-    decision = my_ride.removePlace(p);
+    decision = my_ride.removePlace(place_name);
     
+    
+    Remove_Place_pressed();
     
     if (decision)
     {
@@ -1230,7 +1250,6 @@ void Lines_window::Remove_Place() {
     }
     
     
-    Remove_Place_pressed();
     
     cout<<"REMOVED PLACE" << endl;
     
@@ -1289,7 +1308,206 @@ void Lines_window::cb_request_a_ride(Address, Address pw){
 }
 
 void Lines_window::Request_a_Ride(){
-    Request_a_Ride_pressed();
+    
+    
+        String customer_name = c_name.get_string();
+        String place_A_info = place_A_name.get_string();
+        String tag="";
+        String place_B_info = "";
+    
+        vector<Customer> customers = my_ride.customers;
+        vector<Driver> drivers = my_ride.drivers;
+        vector<Place_info> places = my_ride.locations;
+    
+        if (drivers.size() == 0) {
+            //if there are no drivers return to menu
+            cout << "\nThere must be one driver in the system\nReturning you to the menu\n";
+            main_menu_pressed();
+            return;
+        }
+        else if (customers.size() == 0) {
+            //if there are no customers return to menu
+            cout << "\nThere must be one customer in the system\nReturning you to the menu\n";
+            main_menu_pressed();
+            return;
+        }
+    
+        int customer_index = -1;    //start index as invalid
+        //iterate through customers
+        for (size_t i = 0; i < customers.size(); i++) {
+            if (customers[i].getName() == customer_name) {
+                //when we found the customer the user was talking about
+                customer_index = i;
+                break;
+            }
+        }
+    
+        if (customer_index == -1) {
+            //customer index was not found
+            cout << "CUSTOMER NOT FOUND" << endl;
+            main_menu_pressed();
+            return;
+        }
+    
+        //the customer recieving the drive
+        Customer& customer = customers[customer_index];
+    
+        Place_info starting_location;
+    
+        int start_index = -1;    //start index as invalid
+        //iterate through places
+        for (size_t i = 0; i < places.size(); i++) {
+            if (places[i].getName() == place_A_info) {
+                //when we found the place the user was talking about
+                start_index = i;
+                break;
+            }
+        }
+    
+
+        if (start_index == -1) {
+            //start index was not found
+            cout << "PLACE NOT FOUND" << endl;
+            main_menu_pressed();
+            return;
+        }
+    
+    starting_location= places[start_index];
+    
+        Place_info destination;
+    
+        if (type_B == 't')
+        {
+            tag = place_B.get_string();
+            
+            
+            for (int i = 0; i < places.size(); i++) {
+                bool contain = false;
+                for (String t : places[i].getTags()){
+                    contain |= (tag == t);
+                }
+                if (!contain)
+                {
+                    places.erase(places.begin() + i--);
+                }
+            }
+            int index = 0;
+            if (places.size() == 0)
+            {
+                cout << "NO PLACE WITH GIVEN TAG" << endl;
+                main_menu_pressed();
+                return;
+            }
+            double min_dist = distance(starting_location.getLocation(), places[0].getLocation());
+            double dist = 0;
+            for (int i = 1; i < places.size(); i++)
+            {
+                dist = distance(starting_location.getLocation(), places[i].getLocation());
+                if (min_dist > dist){
+                    min_dist=dist;
+                    index = i;
+                }
+            }
+            destination = places[index];
+        }
+        else
+        {
+            place_B_info = place_B.get_string();
+            
+            int index = -1;
+            for (int i = 0; i < places.size(); i++)
+            {
+                if (places[i].getName() == place_B_info)
+                {
+                    index = i;
+                    break;
+                }
+            }
+            
+            if (index != -1)
+            {
+                destination = places[index];
+            }
+            else
+            {
+                cout << "PLACE NOT FOUND" << endl;
+                main_menu_pressed();
+                return;
+            }
+            
+        }
+    
+        //find closest driver
+        int closest_driver_index = 0;     //assume first is the closest
+        double min_distance = distance(drivers[0].getGeoLocation(), starting_location.getLocation());
+    
+        //iterate list trying to find a driver closer
+        for (size_t i = 1; i < drivers.size(); i++) {
+            if (min_distance > distance(drivers[i].getGeoLocation(), starting_location.getLocation())) {
+                //if this driver is closer update variables
+                min_distance = distance(drivers[i].getGeoLocation(), starting_location.getLocation());
+                closest_driver_index = i;
+            }
+        }
+    
+        //Driver driving the customer has been found
+        Driver closest_driver = drivers[closest_driver_index];
+    
+        //move driver to destination
+        closest_driver.setLocation(destination.getLocation());
+    
+        //calculate consts
+        double trip_distance = distance(starting_location.getLocation(), destination.getLocation());
+    
+        //confirm the users
+        cout << "The trip from " << starting_location.getName()
+        << " to " << destination.getName() << " was " << trip_distance << " miles away.\n";
+    
+        //Add credit to the driver
+        closest_driver.addCredit(trip_distance*0.5);
+        //charge the customer
+        customer.charge(trip_distance);
+    
+        //print out travel information to the user
+        cout << "Driver " << closest_driver.getName();
+        printf(" recieved $%.2f.\n", trip_distance*0.5);
+        cout << "Customer " << customer.getName();
+        printf(" was charged $%.2f.\n", trip_distance);
+    
+    
+        Request_a_Ride_pressed();
+    
+    int l = x_max()-50;   //length of screen
+    int w = y_max();    //width of screen
+    int r=2;
+    int c=2;
+    
+    imgs.push_back(new Image(Point(5, 5), customer.getPhoto()+".jpg"));
+    info.push_back(new Text(Point(5, 20+w/r-60), "Customer: "+customer.getName()));
+    
+    imgs.push_back(new Image(Point(5+l/c, 5), closest_driver.getPhoto()+".jpg"));
+    info.push_back(new Text(Point(5+l/c, 20+w/r-60), "Driver: "+closest_driver.getName()));
+    
+    imgs.push_back(new Image(Point(5, 5+w/r), starting_location.getPhoto()+".jpg"));
+    info.push_back(new Text(Point(5, 20+2*w/r-60), "Place A:"+starting_location.getName()));
+    
+    imgs.push_back(new Image(Point(5+l/c, 5+w/r), destination.getPhoto()+".jpg"));
+    info.push_back(new Text(Point(5+l/c, 20+2*w/r-60),"Place B:"+ destination.getName()));
+    
+
+
+    for(Image* i : imgs)  {
+        i->resize(l/c-100, w/r-60);
+        attach(*i);
+    }
+    
+    for(Text* t: info){
+        attach(*t);
+    }
+    
+    
+    
+
 }
 
 void Lines_window::cb_name_B(Address, Address pw) {
@@ -1313,7 +1531,9 @@ void Lines_window::cb_display_places(Address, Address pw) {
 }
 
 void Lines_window::Display_Places(){
+    type_photos='p';
     vector<Place_info> places = my_ride.locations;
+    cout<<"Places size"<<places.size();
     
     if(type_place_disp == 't')  {
         //display all places with this tag
@@ -1413,10 +1633,10 @@ void Lines_window::Display_Places(){
         attach(*t);
     }
     
+    places.clear();
 }
     
 
-   
 
 
 void Lines_window::cb_a_places(Address, Address pw) {
@@ -1444,6 +1664,7 @@ void Lines_window::cb_display_drivers(Address, Address pw) {
 }
 
 void Lines_window::Display_Drivers(){
+    type_photos='d';
     //get the Drivers from my_ride
     vector<Driver> drivers = my_ride.getDrivers();
     
@@ -1615,6 +1836,7 @@ void Lines_window::cb_display_customers(Address, Address pw) {
 void Lines_window::Display_Customers(){
     vector<Customer> customers = my_ride.getCustomers();
     
+    type_photos='c';
     if(type_customer_disp == 'n')   {
         //prune negative customers
         for(int i = 0; i < customers.size(); i++)
